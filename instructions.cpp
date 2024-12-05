@@ -2,6 +2,8 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <sstream>
+#include <string>
 #include "instructions.h"
 
 // ========== InstructionBase ==========
@@ -25,55 +27,43 @@ void InstructionBase::_set_address(addr_t address) {
   _address = address & ARCH_BITMASK;
 }
 
-char* InstructionBase::to_string() const {
-  // Having a malloc is definitely a bad sign
-  char* buffer = (char *) malloc(32);
+std::string InstructionBase::to_string() const {
+    std::ostringstream oss;
+    std::string instruction_name = name();
 
-  // Figure out what the instruction actually is based on the return value of name()
-  // and then generate an appropriate instruction-specific string
-  if (strncmp(name(), "ADD", 3) == 0)
-    sprintf(buffer, "%s: ACC <- ACC + [%d]", name(), get_address());
-  else if (strncmp(name(), "AND", 3) == 0)
-    sprintf(buffer, "%s: ACC <- ACC & [%d]", name(), get_address());
-  else if (strncmp(name(), "ORR", 3) == 0)
-    sprintf(buffer, "%s: ACC <- ACC | [%d]", name(), get_address());
-  else if (strncmp(name(), "XOR", 3) == 0)
-    sprintf(buffer, "%s: ACC <- ACC ^ [%d]", name(), get_address());
-  else if (strncmp(name(), "LDR", 3) == 0)
-    sprintf(buffer, "%s: ACC <- [%d]", name(), get_address());
-  else if (strncmp(name(), "STR", 3) == 0)
-    sprintf(buffer, "%s: ACC -> [%d]", name(), get_address());
-  else if (strncmp(name(), "JMP", 3) == 0)
-    sprintf(buffer, "%s: PC  <- %d", name(), get_address());
-  else if (strncmp(name(), "JNE", 3) == 0)
-    sprintf(buffer, "%s: PC  <- %d if ACC != 0", name(), get_address());
-  else
-    // This should never happen unless we have an error in name() or one of the strncmp's above
-    // i.e. the tests will never try to trigger this code
-    assert(0);
-  return buffer;
+    if (instruction_name == "ADD") {
+        oss << "ADD: ACC <- ACC + [" << get_address() << "]";
+    } else if (instruction_name == "AND") {
+        oss << "AND: ACC <- ACC & [" << get_address() << "]";
+    } else if (instruction_name == "ORR") {
+        oss << "ORR: ACC <- ACC | [" << get_address() << "]";
+    } else if (instruction_name == "XOR") {
+        oss << "XOR: ACC <- ACC ^ [" << get_address() << "]";
+    } else if (instruction_name == "LDR") {
+        oss << "LDR: ACC <- [" << get_address() << "]";
+    } else if (instruction_name == "STR") {
+        oss << "STR: ACC -> [" << get_address() << "]";
+    } else if (instruction_name == "JMP") {
+        oss << "JMP: PC  <- " << get_address();
+    } else if (instruction_name == "JNE") {
+        oss << "JNE: PC  <- " << get_address() << " if ACC != 0";
+    }
+    
+    return oss.str();
 }
 
-InstructionBase* InstructionBase::generateInstruction(InstructionData data) {
-  // This could be a switch-case, but it's not important
-  if (data.opcode == ADD)
-    return new Iadd(data.address);
-  if (data.opcode == AND)
-    return new Iand(data.address);
-  if (data.opcode == ORR)
-    return new Iorr(data.address);
-  if (data.opcode == XOR)
-    return new Ixor(data.address);
-  if (data.opcode == LDR)
-    return new Ildr(data.address);
-  if (data.opcode == STR)
-    return new Istr(data.address);
-  if (data.opcode == JMP)
-    return new Ijmp(data.address);
-  if (data.opcode == JNE)
-    return new Ijne(data.address);
-
-  return NULL;
+std::unique_ptr<InstructionBase> InstructionBase::generateInstruction(InstructionData data) {
+    switch(data.opcode) {
+        case ADD: return std::make_unique<Iadd>(data.address);
+        case AND: return std::make_unique<Iand>(data.address);
+        case ORR: return std::make_unique<Iorr>(data.address);
+        case XOR: return std::make_unique<Ixor>(data.address);
+        case LDR: return std::make_unique<Ildr>(data.address);
+        case STR: return std::make_unique<Istr>(data.address);
+        case JMP: return std::make_unique<Ijmp>(data.address);
+        case JNE: return std::make_unique<Ijne>(data.address);
+        default: return nullptr;
+    }
 }
 
 // ========== ADD Instruction ==========
@@ -85,7 +75,7 @@ void Iadd::_execute(ProcessorState& state) const {
   state.acc += state.memory[get_address()];
 }
 
-const char* Iadd::name() const {
+const std::string Iadd::name() const {
   return "ADD";
 }
 
@@ -98,7 +88,7 @@ void Iand::_execute(ProcessorState& state) const {
   state.acc &= state.memory[get_address()];
 }
 
-const char* Iand::name() const {
+const std::string Iand::name() const {
   return "AND";
 }
 
@@ -111,7 +101,7 @@ void Iorr::_execute(ProcessorState& state) const {
   state.acc |= state.memory[get_address()];
 }
 
-const char* Iorr::name() const {
+const std::string Iorr::name() const {
   return "ORR";
 }
 
@@ -120,12 +110,11 @@ Ixor::Ixor(addr_t address) {
   _set_address(address);
 }
 
-
 void Ixor::_execute(ProcessorState& state) const {
   state.acc ^= state.memory[get_address()];
 }
 
-const char* Ixor::name() const {
+const std::string Ixor::name() const {
   return "XOR";
 }
 
@@ -138,7 +127,7 @@ void Ildr::_execute(ProcessorState& state) const {
   state.acc = state.memory[get_address()];
 }
 
-const char* Ildr::name() const {
+const std::string Ildr::name() const {
   return "LDR";
 }
 
@@ -151,7 +140,7 @@ void Istr::_execute(ProcessorState& state) const {
   state.memory[get_address()] = state.acc;
 }
 
-const char* Istr::name() const {
+const std::string Istr::name() const {
   return "STR";
 }
 
@@ -169,7 +158,7 @@ void Ijmp::_execute(ProcessorState& state) const {
   state.pc = get_address() - 2;
 }
 
-const char* Ijmp::name() const {
+const std::string Ijmp::name() const {
   return "JMP";
 }
 
@@ -184,7 +173,7 @@ void Ijne::_execute(ProcessorState& state) const {
     state.pc = get_address() - 2;
 }
 
-const char* Ijne::name() const {
+const std::string Ijne::name() const {
   return "JNE";
 }
 

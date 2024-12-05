@@ -10,16 +10,19 @@
 // -----------------------------------------------------------------------------
 
 #include <inttypes.h>
+#include <array>
+#include <string>
+#include <memory>
 
 //------------------------------------------------------------------------------
 //--------------------               CONSTANTS              --------------------
 //------------------------------------------------------------------------------
-#define ARCH_BITS 8
-#define ARCH_BITMASK ((1 << ARCH_BITS) - 1)
-#define ARCH_MAXVAL ARCH_BITMASK
-#define INSTRUCTION_SIZE 2
-#define MEMORY_SIZE 256
-#define MAX_NAME 96
+constexpr int ARCH_BITS = 8;
+constexpr int ARCH_BITMASK = ((1 << ARCH_BITS) - 1);
+constexpr int ARCH_MAXVAL = ARCH_BITMASK;
+constexpr int INSTRUCTION_SIZE = 2;
+constexpr int MEMORY_SIZE = 256;
+constexpr int MAX_NAME = 96;
 
 
 //------------------------------------------------------------------------------
@@ -52,21 +55,21 @@
  * expecting an address is likely to be an error, so capturing this error at
  * compile-time is good!
  */
-typedef int addr_t;
+using addr_t = int;
 
 /**
  * Use the type `data_t` for variables holding generic data.
  *
  * Similar issues as discussed for `addr_t`
  */
-typedef int data_t;
+using data_t = int;
 
 /**
  * Use the type byte_t for memory locations.
  * Here, for storage efficiency, we actually use only 8 bits for each byte.
  * Btw, uint8_t is an integer type guaranteed to be unsigned and 8 bits wide.
  */
-typedef uint8_t byte_t;
+using byte_t = uint8_t;
 
 /**
  * A basic struct that just holds the two bytes representing the instruction in the memory
@@ -103,19 +106,15 @@ struct ProcessorState {
   /**
    * Byte array representing the memory of the system
    */
-  byte_t memory[MEMORY_SIZE];
+  std::array<byte_t, MEMORY_SIZE> memory{};
 
   /**
    * The default constructor.
    * It resets the state of the machine.
    * There might be a more elegant way to achieve the same effect.
    */
-  ProcessorState() {
-    acc = 0;
-    pc = 0;
-    for (int i = 0; i < MEMORY_SIZE; ++i)
-      memory[i] = 0;
-  }
+  ProcessorState() 
+    : acc(0), pc(0), memory{} {}
 };
 
 //------------------------------------------------------------------------------
@@ -178,7 +177,8 @@ class InstructionBase {
      *
      * @return the string (and its ownership)
      */
-    char* to_string() const;
+    // char* to_string() const;
+    std::string to_string() const;
 
     /**
      * The instruction-specific functionality of executing an instruction.
@@ -196,7 +196,7 @@ class InstructionBase {
      * Subclasses provide the concrete, instruction-specific behaviour.
      * @return The instruction mnemonic
      */
-    virtual const char* name() const = 0;
+    virtual const std::string name() const = 0;
 
     /**
      * A class method translating opcodes into InstructionBase objects
@@ -207,7 +207,11 @@ class InstructionBase {
      * @param opcode A number identifying the type of the instruction
      * @return A pointer to an object whose dynamic type matches the type requested
      */
-    static InstructionBase* generateInstruction(InstructionData data);
+    // static InstructionBase* generateInstruction(InstructionData data);
+    static std::unique_ptr<InstructionBase> generateInstruction(InstructionData data);
+
+    // Destructor
+    virtual ~InstructionBase() = default;
 
   protected:
     /**
@@ -217,7 +221,8 @@ class InstructionBase {
      * Other code is not allowed to create plain Instruction objects. Since it's
      * protected you can remove it, if your code does not need it.
      */
-    InstructionBase() { };
+    // InstructionBase() { };
+    InstructionBase() = default;
 
     /**
      * A convenience protected setter for _address
@@ -233,5 +238,5 @@ class InstructionBase {
     void _set_address(addr_t address);
 
   private:
-    addr_t _address;
+    addr_t _address{0};
 };

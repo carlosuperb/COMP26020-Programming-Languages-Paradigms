@@ -20,6 +20,7 @@
 // -----------------------------------------------------------------------------
 
 #include "common.h"
+#include <memory>
 
 /** 
  * Enum representing the various opcodes.
@@ -43,79 +44,79 @@ enum InstructionOpcode {
 /**
  * Class representing an ADD instruction
  */
-class Iadd : public InstructionBase{
+class Iadd final : public InstructionBase {
   public:
-    Iadd(addr_t address);
-    void _execute(ProcessorState& state) const;
-    const char* name() const;
+    explicit Iadd(addr_t address);
+    void _execute(ProcessorState& state) const override;
+    const std::string name() const override;
 };
 
 /**
  * Class representing an AND instruction
  */
-class Iand : public InstructionBase{
-  public:
-    Iand(addr_t address);
-    void _execute(ProcessorState& state) const;
-    const char* name() const;
+class Iand final : public InstructionBase {
+public:
+  explicit Iand(addr_t address);
+  void _execute(ProcessorState& state) const override;
+  const std::string name() const override;
 };
 
 /**
  * Class representing an ORR instruction
  */
-class Iorr : public InstructionBase{
-  public:
-    Iorr(addr_t address);
-    void _execute(ProcessorState& state) const;
-    const char* name() const;
+class Iorr final : public InstructionBase {
+public:
+  explicit Iorr(addr_t address);
+  void _execute(ProcessorState& state) const override;
+  const std::string name() const override;
 };
 
 /**
  * Class representing a XOR instruction
  */
-class Ixor : public InstructionBase{
+class Ixor final : public InstructionBase {
   public:
-    Ixor(addr_t address);
-    void _execute(ProcessorState& state) const;
-    const char* name() const;
+    explicit Ixor(addr_t address);
+    void _execute(ProcessorState& state) const override;
+    const std::string name() const override;
 };
 
 /**
  * Class representing an LDR instruction
  */
-class Ildr : public InstructionBase{
+class Ildr final : public InstructionBase {
   public:
-    Ildr(addr_t address);
-    void _execute(ProcessorState& state) const;
-    const char* name() const;
+    explicit Ildr(addr_t address);
+    void _execute(ProcessorState& state) const override;
+    const std::string name() const override;
 };
 
 /**
  * Class representing an STR instruction
  */
-class Istr : public InstructionBase{
+class Istr final : public InstructionBase {
   public:
-    Istr(addr_t address);
-    void _execute(ProcessorState& state) const;
-    const char* name() const;
+    explicit Istr(addr_t address);
+    void _execute(ProcessorState& state) const override;
+    const std::string name() const override;
 };
 
 /**
  * Class representing an unconditional JMP
  */
-class Ijmp : public InstructionBase{
+class Ijmp final : public InstructionBase {
   public:
-    Ijmp(addr_t address);
-    void _execute(ProcessorState& state) const;
-    const char* name() const;
+    explicit Ijmp(addr_t address);
+    void _execute(ProcessorState& state) const override;
+    const std::string name() const override;
 };
 
 /**
  * Class representing a conditional JNE
  */
-class Ijne : public InstructionBase{
-  public:
-    Ijne(addr_t address);
-    void _execute(ProcessorState& state) const;
-    const char* name() const;
+class Ijne final : public InstructionBase {
+public:
+    explicit Ijne(addr_t address);
+    void _execute(ProcessorState& state) const override;
+    const std::string name() const override;
 };

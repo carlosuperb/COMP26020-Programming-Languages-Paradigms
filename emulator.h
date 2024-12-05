@@ -21,11 +21,15 @@
 // -----------------------------------------------------------------------------
 
 #include "common.h"
+#include <memory>
+#include <string>
+#include <vector>
+#include <optional>
 
 //------------------------------------------------------------------------------
 //--------------------               CONSTANTS              --------------------
 //------------------------------------------------------------------------------
-#define MAX_INSTRUCTIONS ((MEMORY_SIZE) / (INSTRUCTION_SIZE))
+constexpr int MAX_INSTRUCTIONS = ((MEMORY_SIZE) / (INSTRUCTION_SIZE));
 
 //------------------------------------------------------------------------------
 //--------------------               CLASSES                --------------------
@@ -53,7 +57,7 @@ class Breakpoint {
      * @param address The address on which we break
      * @param name A symbolic name for the breakpoint. We are not allowed to modify or take ownership of this string. The name can contain any alphanumeric character (no spaces allowed). The name is guaranteed to be valid (i.e. not null)
      */
-    Breakpoint(addr_t address, const char* name);
+    Breakpoint(addr_t address, const std::string& name);
 
     // Copy/Move Constructors
     Breakpoint(const Breakpoint& other);
@@ -63,6 +67,9 @@ class Breakpoint {
     Breakpoint& operator=(const Breakpoint& other);
     Breakpoint& operator=(Breakpoint&& other) noexcept;
 
+    // Destructor
+    ~Breakpoint() = default;
+
     /**
      * Getter for the address
      */
@@ -71,21 +78,21 @@ class Breakpoint {
     /**
      * Getter for the name
      */
-    const char* get_name() const;
+    const std::string get_name() const;
 
     /**
      * Testing whether the breakpoint targets this address
      */
-    int has(addr_t address) const;
+    bool has(addr_t address) const;
 
     /**
      * Testing whether the breakpoint targets this name
      */
-    int has(const char* name) const;
+    bool has(const std::string& name) const;
 
   private:
-    addr_t _address;
-    char* _name;
+    addr_t _address{0};
+    std::string _name;
 };
 
 /**
@@ -138,6 +145,9 @@ class Emulator {
      */
     Emulator& operator=(Emulator&& other) noexcept;
 
+    // Destructor
+    ~Emulator() = default;
+
 
 
     // ----------> Main emulation loop
@@ -155,7 +165,7 @@ class Emulator {
      * @param instruction The byte representation of the instruction
      * @return an **owning** object pointer inheriting from InstructionBase that has a) the dynamic type indicated by the instruction opcode and b) the target address indicated by the instruction's second byte
      */
-    InstructionBase* decode(InstructionData instruction) const;
+    std::unique_ptr<InstructionBase> decode(InstructionData data) const;
 
     /**
      * A simple function just calling the instructions execute function
@@ -163,7 +173,8 @@ class Emulator {
      * @param instr The instruction to execute
      * @return whether the execution was successful (1 means success, 0 failure)
      */
-    int execute(InstructionBase* instr);
+    // int execute(InstructionBase* instr);
+    int execute(const InstructionBase* instr);
 
     /**
      * Run iterations for a certain number of steps, until an error happens, or we reach a breakpoint
@@ -184,7 +195,7 @@ class Emulator {
      * @param name The name of the breakpoints (non-owning pointer)
      * @return whether the operation was successful (1 means success, 0 failure)
      */
-    int insert_breakpoint(addr_t address, const char* name);
+    int insert_breakpoint(addr_t address, const std::string& name);
 
     /**
      * Find the breakpoint with the given address in our breakpoint storage
@@ -200,7 +211,7 @@ class Emulator {
      * @param name The name of the breakpoint (non-owning pointer)
      * @return A non-owning pointer to the Breakpoint or null if the name was not found
      */
-    const Breakpoint* find_breakpoint(const char* name) const;
+    const Breakpoint* find_breakpoint(const std::string& name) const;
 
     /**
      * Unregister the breakpoint with the given address
@@ -216,7 +227,7 @@ class Emulator {
      * @param name The name of the breakpoint (non-owning pointer)
      * @return Whether a breakpoint was removed (1 means removed, 0 means none removed)
      */
-    int delete_breakpoint(const char* name);
+    int delete_breakpoint(const std::string& name);
 
     /**
      * Get the number of registered breakpoints
@@ -303,7 +314,7 @@ class Emulator {
   
   private:
     ProcessorState state;
-    Breakpoint* breakpoints;
-    int breakpoints_sz;
+    std::vector<Breakpoint> breakpoints;
     int total_cycles;
+
 };
