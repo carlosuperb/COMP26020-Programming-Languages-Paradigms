@@ -20,7 +20,6 @@
 // -----------------------------------------------------------------------------
 
 #include "common.h"
-#include <memory>
 
 /** 
  * Enum representing the various opcodes.

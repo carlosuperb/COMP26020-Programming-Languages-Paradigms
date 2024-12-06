@@ -9,9 +9,7 @@
 // A few definitions that are used in both source files
 // -----------------------------------------------------------------------------
 
-#include <inttypes.h>
 #include <array>
-#include <string>
 #include <memory>
 
 //------------------------------------------------------------------------------

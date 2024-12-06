@@ -21,10 +21,7 @@
 // -----------------------------------------------------------------------------
 
 #include "common.h"
-#include <memory>
-#include <string>
 #include <vector>
-#include <optional>
 
 //------------------------------------------------------------------------------
 //--------------------               CONSTANTS              --------------------
@@ -315,6 +312,5 @@ class Emulator {
   private:
     ProcessorState state;
     std::vector<Breakpoint> breakpoints;
-    int total_cycles;
-
+    int total_cycles {0};
 };

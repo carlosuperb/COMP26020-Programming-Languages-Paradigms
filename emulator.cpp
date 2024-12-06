@@ -1,13 +1,7 @@
-#include <cassert>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <utility>
 #include "emulator.h"
 #include <algorithm>
 #include <fstream>
 #include <iostream>
-#include <sstream>
 
 // ============= Breakpoint ==============
 Breakpoint::Breakpoint() { }
