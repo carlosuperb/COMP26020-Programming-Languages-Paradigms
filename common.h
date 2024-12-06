@@ -210,7 +210,10 @@ class InstructionBase {
     // static InstructionBase* generateInstruction(InstructionData data);
     static std::unique_ptr<InstructionBase> generateInstruction(InstructionData data);
 
-    // Destructor
+    InstructionBase(const InstructionBase&) = default;
+    InstructionBase(InstructionBase&&) noexcept = default;
+    InstructionBase& operator=(const InstructionBase&) = default;
+    InstructionBase& operator=(InstructionBase&&) noexcept = default;
     virtual ~InstructionBase() = default;
 
   protected:

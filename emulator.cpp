@@ -101,7 +101,7 @@ Emulator& Emulator::operator=(Emulator&& other) noexcept {
 // ----------> Main emulation loop
 
 InstructionData Emulator::fetch() const {
-  return {state.memory[state.pc], state.memory[state.pc + 1]};
+  return {state.memory.at(state.pc), state.memory.at(state.pc + 1)};
 }
 
 std::unique_ptr<InstructionBase> Emulator::decode(InstructionData data) const {
@@ -256,7 +256,7 @@ int Emulator::load_state(const char* filename) {
         state.memory[offset] = static_cast<byte_t>(num);
     }
 
-    int address;
+    int address = 0;
     std::string name;
     while (file >> address >> name) {
         if (address < 0 || address >= MEMORY_SIZE)
