@@ -15,7 +15,7 @@ Breakpoint::Breakpoint(const Breakpoint& other)
 
 // Move constructor
 Breakpoint::Breakpoint(Breakpoint&& other) noexcept
-: _address(other._address), _name(std::move(other._name)) {}
+: _address(std::move(other._address)), _name(std::move(other._name)) {}
 
 // Copy assignment
 Breakpoint& Breakpoint::operator=(const Breakpoint& other) {
@@ -29,9 +29,10 @@ Breakpoint& Breakpoint::operator=(const Breakpoint& other) {
 // Move assignment
 Breakpoint& Breakpoint::operator=(Breakpoint&& other) noexcept {
   if (this != &other){
-    _address = other._address;
+    _address = std::move(other._address);
     _name = std::move(other._name);
   }
+
   return *this;
 }
 
