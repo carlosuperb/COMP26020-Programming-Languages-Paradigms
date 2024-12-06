@@ -67,9 +67,7 @@ Iadd::Iadd(addr_t address) {
 }
 
 void Iadd::_execute(ProcessorState& state) const {
-  if (get_address() >= 0 && get_address() < state.memory.size()) {
-    state.acc += state.memory[get_address()];
-  }
+  state.acc += state.memory.at(get_address());
 }
 
 const std::string Iadd::name() const {
@@ -82,9 +80,7 @@ Iand::Iand(addr_t address) {
 }
 
 void Iand::_execute(ProcessorState& state) const {
-  if (get_address() >= 0 && get_address() < state.memory.size()) {
-    state.acc &= state.memory[get_address()];
-  }
+  state.acc &= state.memory.at(get_address());
 }
 
 const std::string Iand::name() const {
@@ -97,9 +93,7 @@ Iorr::Iorr(addr_t address) {
 }
 
 void Iorr::_execute(ProcessorState& state) const {
-  if (get_address() >= 0 && get_address() < state.memory.size()) {
-    state.acc |= state.memory[get_address()];
-  }
+  state.acc |= state.memory.at(get_address());
 }
 
 const std::string Iorr::name() const {
@@ -112,9 +106,7 @@ Ixor::Ixor(addr_t address) {
 }
 
 void Ixor::_execute(ProcessorState& state) const {
-  if (get_address() >= 0 && get_address() < state.memory.size()) {
-    state.acc ^= state.memory[get_address()];
-  }
+  state.acc ^= state.memory.at(get_address());
 }
 
 const std::string Ixor::name() const {
@@ -127,9 +119,7 @@ Ildr::Ildr(addr_t address) {
 }
 
 void Ildr::_execute(ProcessorState& state) const {
-  if (get_address() >= 0 && get_address() < state.memory.size()) {
-    state.acc = state.memory[get_address()];
-  }
+  state.acc = state.memory.at(get_address());
 }
 
 const std::string Ildr::name() const {
@@ -142,9 +132,7 @@ Istr::Istr(addr_t address) {
 }
 
 void Istr::_execute(ProcessorState& state) const {
-  if (get_address() >= 0 && get_address() < state.memory.size()) {
-    state.memory[get_address()] = state.acc;
-  }
+  state.memory.at(get_address()) = state.acc;
 }
 
 const std::string Istr::name() const {

@@ -195,7 +195,11 @@ addr_t Emulator::read_pc() const {
 addr_t Emulator::read_mem(addr_t address) const {
   // limit address to the allowed range of values
   address &= ARCH_BITMASK;
-  return state.memory[address];
+  if (address >= 0 && address < MEMORY_SIZE) {
+    return state.memory.at(address);
+  } else {
+    throw std::out_of_range("Address is out of bounds");
+  }
 }
 
 // ----------> Utilities
@@ -210,7 +214,7 @@ int Emulator::is_breakpoint() const {
 
 int Emulator::print_program() const {
   for (int offset = 0; offset < MEMORY_SIZE; offset += INSTRUCTION_SIZE) {
-    InstructionData data{state.memory[offset], state.memory[offset + 1]};
+    InstructionData data{state.memory.at(offset), state.memory.at(offset + 1)};
 
     auto instr = decode(data);
 
@@ -247,7 +251,7 @@ int Emulator::load_state(const char* filename) {
     for (int offset = 0; offset < MEMORY_SIZE; ++offset) {
         if (!(file >> num) || num > ARCH_MAXVAL || num < 0)
             return 0;
-        state.memory[offset] = static_cast<byte_t>(num);
+        state.memory.at(offset) = static_cast<byte_t>(num);
     }
 
     int address = 0;
@@ -273,7 +277,7 @@ int Emulator::save_state(const char* filename) const {
     file << state.pc << '\n';
 
     for (int offset = 0; offset < MEMORY_SIZE; ++offset) {
-        file << static_cast<int>(state.memory[offset]) << '\n';
+        file << static_cast<int>(state.memory.at(offset)) << '\n';
     }
 
     for (const auto& bp : breakpoints) {
