@@ -8,7 +8,7 @@ contract Paylock {
     int public clock;
     int public time_collect_1N_called;
     address timeAdd;
-    State st;
+    State public st;
     
     constructor(address agreed_third_party) public {
         st = State.Working;
@@ -85,6 +85,8 @@ contract Supplier {
     enum State { Working , Completed , Rented , Returned }
     
     State st;
+
+    bool private attacking = false;
     
     constructor(address paylock_address, address payable rental_address) public {
         p = Paylock(paylock_address);
@@ -103,6 +105,8 @@ contract Supplier {
     function return_resource() external {
         require(st == State.Rented, "Supplier: Must be in Rented state to return resource");
 
+        attacking = true;
+
         r.retrieve_resource();
 
         st = State.Returned;
@@ -117,7 +121,7 @@ contract Supplier {
     }
 
     receive() external payable {}
-
+    
     function getSupplierBalance() public view returns (uint) {
         return address(this).balance;
     }
@@ -165,15 +169,16 @@ contract Rental {
         require(resource_available == false, "Rental: No resource is currently rented out");
         require(msg.sender == resource_owner, "Rental: Only the original renter can return the resource");
 
+        // Update internal state first to prevent reentrancy attacks
+        resource_available = true;
+
         //RETURN DEPOSIT HERE
         (bool success, ) = msg.sender.call.value(1 wei)("");
         require(success, "Rental: Failed to return deposit via call");
-
-        resource_available = true;
     }
 
     receive() external payable {}
-
+    
     function getBalance() public view returns (uint) {
         return address(this).balance;
     }

