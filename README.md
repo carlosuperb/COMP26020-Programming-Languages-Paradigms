@@ -1,4 +1,4 @@
-# COMP26020 Part 2 – Quadtrees in Haskell
+# COMP26020 Part 3 – Quadtrees in Haskell
 
 ## Overview
 This project implements a **quadtree data structure** in Haskell to represent black-and-white bitmap images.  
